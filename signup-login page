@@ -1,0 +1,67 @@
+import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+void main() {
+  runApp(const NutriCheckApp());
+}
+
+class NutriCheckApp extends StatelessWidget {
+  const NutriCheckApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'NutriCheck',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+      ),
+      home: const WebViewContainer(),
+    );
+  }
+}
+
+class WebViewContainer extends StatefulWidget {
+  const WebViewContainer({super.key});
+
+  @override
+  _WebViewContainerState createState() => _WebViewContainerState();
+}
+
+class _WebViewContainerState extends State<WebViewContainer> {
+  late final WebViewController _controller;
+  bool _isLoading = true; // Show loading indicator
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (url) {
+            setState(() {
+              _isLoading = false; // Hide loading indicator when page loads
+            });
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse("https://your-hosted-html.com")); // Replace with your hosted URL
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("NutriCheck")),
+      body: Stack(
+        children: [
+          WebViewWidget(controller: _controller),
+          if (_isLoading)
+            const Center(
+              child: CircularProgressIndicator(), // Show loading indicator
+            ),
+        ],
+      ),
+    );
+  }
+}
